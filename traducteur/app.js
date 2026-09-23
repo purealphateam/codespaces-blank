@@ -2,6 +2,7 @@
 
 // Langues proposées : code de traduction, code de reconnaissance/synthèse vocale, nom affiché.
 const LANGS = [
+  { code: 'ar', speech: 'ar-SA', name: 'Arabe (Arabie saoudite)', rtl: true },
   { code: 'fr', speech: 'fr-FR', name: 'Français' },
   { code: 'en', speech: 'en-US', name: 'Anglais' },
   { code: 'es', speech: 'es-ES', name: 'Espagnol' },
@@ -9,7 +10,6 @@ const LANGS = [
   { code: 'it', speech: 'it-IT', name: 'Italien' },
   { code: 'pt', speech: 'pt-PT', name: 'Portugais' },
   { code: 'nl', speech: 'nl-NL', name: 'Néerlandais' },
-  { code: 'ar', speech: 'ar-SA', name: 'Arabe' },
   { code: 'zh-CN', speech: 'zh-CN', name: 'Chinois (simplifié)' },
   { code: 'ja', speech: 'ja-JP', name: 'Japonais' },
   { code: 'ko', speech: 'ko-KR', name: 'Coréen' },
@@ -145,6 +145,7 @@ function addHistory(src, original, translated) {
   const dstEl = document.createElement('span');
   dstEl.className = 'dst';
   dstEl.textContent = translated;
+  srcEl.dir = dstEl.dir = 'auto';
   const replay = document.createElement('button');
   replay.className = 'replay';
   replay.type = 'button';
@@ -264,15 +265,18 @@ function fillSelects() {
     for (const l of LANGS) side[s].select.add(new Option(l.name, l.code));
   }
   let saved = {};
-  try { saved = JSON.parse(localStorage.getItem('traducteur-langs') || '{}'); } catch { /* ignoré */ }
-  els.langA.value = LANGS.some((l) => l.code === saved.a) ? saved.a : 'fr';
-  els.langB.value = LANGS.some((l) => l.code === saved.b) ? saved.b : 'en';
+  try { saved = JSON.parse(localStorage.getItem('traducteur-langs-v2') || '{}'); } catch { /* ignoré */ }
+  els.langA.value = LANGS.some((l) => l.code === saved.a) ? saved.a : 'ar';
+  els.langB.value = LANGS.some((l) => l.code === saved.b) ? saved.b : 'fr';
 }
 
 function onLangChange() {
-  for (const s of ['a', 'b']) side[s].title.textContent = langOf(s).name;
+  for (const s of ['a', 'b']) {
+    side[s].title.textContent = langOf(s).name;
+    side[s].text.dir = langOf(s).rtl ? 'rtl' : 'ltr';
+  }
   try {
-    localStorage.setItem('traducteur-langs', JSON.stringify({ a: els.langA.value, b: els.langB.value }));
+    localStorage.setItem('traducteur-langs-v2', JSON.stringify({ a: els.langA.value, b: els.langB.value }));
   } catch { /* ignoré */ }
   if (activeSide) startListening(activeSide);
   if (els.textA.value.trim()) translateInto('a', els.textA.value);

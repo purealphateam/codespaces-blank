@@ -2,7 +2,7 @@
 
 Application web qui traduit la voix en temps réel :
 
-1. Choisissez les deux langues de la conversation (19 langues, dont le lingala et le swahili).
+1. Par défaut : **arabe (Arabie saoudite, ar-SA) → français**. Vous pouvez changer les langues (19 au choix).
 2. Appuyez sur **Parler** du côté de la personne qui parle.
 3. Le texte s'affiche pendant que vous parlez et sa traduction s'affiche en même temps de l'autre côté.
 4. À la fin de chaque phrase, la traduction est lue à voix haute et ajoutée à l'historique de la conversation.
