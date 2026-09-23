@@ -83,6 +83,39 @@ select {
   font-size: 1.2rem;
 }
 
+.live-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.listen {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.listen .dot { width: 12px; height: 12px; border-radius: 50%; background: currentColor; }
+.listen.listening { background: var(--live); }
+.listen.listening .dot { animation: pulse 1s infinite; }
+.listen:disabled { opacity: 0.5; cursor: not-allowed; }
+.live-src { margin: 0; color: var(--muted); font-size: 1.05rem; min-height: 1.5em; }
+.live-dst { margin: 0; font-size: 1.6rem; font-weight: 600; line-height: 1.35; min-height: 2.2em; }
+
+.convo { margin-top: 24px; }
+.convo summary { cursor: pointer; font-weight: 600; margin-bottom: 12px; }
+
 .panels {
   display: grid;
   grid-template-columns: 1fr 1fr;

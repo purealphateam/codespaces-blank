@@ -10,7 +10,7 @@
 <body>
   <header class="top">
     <h1>Traducteur en direct</h1>
-    <p class="subtitle">Parlez ou tapez : la traduction s'affiche pendant que vous parlez.</p>
+    <p class="subtitle">Laissez le téléphone écouter autour de vous : ce qui est dit est traduit au fur et à mesure, comme des sous-titres.</p>
   </header>
 
   <main>
@@ -31,10 +31,33 @@
       </label>
     </section>
 
+    <section class="live-card" aria-label="Sous-titres en direct">
+      <button id="listen" class="listen" type="button" aria-pressed="false">
+        <span class="dot"></span><span id="listen-label">Écouter autour de moi</span>
+      </button>
+      <p id="live-src" class="live-src" dir="auto"></p>
+      <p id="live-dst" class="live-dst" dir="auto">La traduction s'affichera ici en direct.</p>
+    </section>
+
+    <section class="options">
+      <label class="toggle"><input type="checkbox" id="auto-speak"> Lire les traductions à voix haute</label>
+      <button id="clear" type="button" class="ghost">Effacer</button>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite">Prêt.</p>
+
+    <section class="history-wrap">
+      <h2>Déjà traduit</h2>
+      <ol id="history" class="history"></ol>
+      <p id="history-empty" class="empty">Aucune phrase traduite pour l'instant.</p>
+    </section>
+
+    <details class="convo">
+      <summary>Conversation à deux et saisie au clavier</summary>
     <section class="panels">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title" id="title-a">Arabe (Arabie saoudite)</span>
+          <span class="panel-title" id="title-a">Arabe saoudien</span>
           <button id="mic-a" class="mic" type="button" aria-pressed="false">
             <span class="dot"></span><span class="mic-label">Parler</span>
           </button>
@@ -53,19 +76,7 @@
       </div>
     </section>
 
-    <section class="options">
-      <label class="toggle"><input type="checkbox" id="auto-speak" checked> Lire la traduction à voix haute</label>
-      <label class="toggle"><input type="checkbox" id="continuous" checked> Écoute continue</label>
-      <button id="clear" type="button" class="ghost">Effacer l'historique</button>
-    </section>
-
-    <p id="status" class="status" role="status" aria-live="polite">Prêt.</p>
-
-    <section class="history-wrap">
-      <h2>Conversation</h2>
-      <ol id="history" class="history"></ol>
-      <p id="history-empty" class="empty">Aucune phrase traduite pour l'instant.</p>
-    </section>
+    </details>
   </main>
 
   <footer class="foot">

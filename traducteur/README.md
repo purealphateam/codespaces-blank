@@ -1,13 +1,21 @@
 # Traducteur en direct
 
-Application web qui traduit la voix en temps réel :
+Application web de sous-titres en direct : le téléphone écoute les gens qui parlent autour de vous et affiche la traduction au fur et à mesure.
 
-1. Par défaut : **arabe (Arabie saoudite, ar-SA) → français**. Vous pouvez changer les langues (19 au choix).
-2. Appuyez sur **Parler** du côté de la personne qui parle.
-3. Le texte s'affiche pendant que vous parlez et sa traduction s'affiche en même temps de l'autre côté.
-4. À la fin de chaque phrase, la traduction est lue à voix haute et ajoutée à l'historique de la conversation.
+Par défaut : **arabe saoudien (ar-SA) → français**. Vous pouvez choisir d'autres langues (19 au choix).
 
-Vous pouvez aussi taper du texte dans l'un ou l'autre des panneaux : la traduction se fait pendant la saisie.
+## Mode écoute (principal)
+
+1. Appuyez sur **Écouter autour de moi** et posez le téléphone près des personnes qui parlent.
+2. La phrase en cours et sa traduction s'affichent en grand pendant qu'elle est prononcée.
+3. Chaque phrase terminée est ajoutée à la liste **Déjà traduit**, les plus récentes en haut.
+4. L'écoute continue sans interruption jusqu'à ce que vous appuyiez sur **Arrêter l'écoute**. L'écran reste allumé pendant l'écoute.
+
+La lecture à voix haute est désactivée par défaut, pour que le micro ne manque rien pendant que le téléphone parle.
+
+## Conversation à deux et saisie au clavier
+
+Cette section se déplie sous la liste. Chaque personne a son propre bouton micro, et vous pouvez aussi taper du texte, qui est traduit pendant la saisie.
 
 ## Lancer l'application
 

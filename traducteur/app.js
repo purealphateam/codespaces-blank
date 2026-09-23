@@ -2,7 +2,7 @@
 
 // Langues proposées : code de traduction, code de reconnaissance/synthèse vocale, nom affiché.
 const LANGS = [
-  { code: 'ar', speech: 'ar-SA', name: 'Arabe (Arabie saoudite)', rtl: true },
+  { code: 'ar', speech: 'ar-SA', name: 'Arabe saoudien', rtl: true },
   { code: 'fr', speech: 'fr-FR', name: 'Français' },
   { code: 'en', speech: 'en-US', name: 'Anglais' },
   { code: 'es', speech: 'es-ES', name: 'Espagnol' },
@@ -29,7 +29,9 @@ const els = {
   textA: $('text-a'), textB: $('text-b'),
   titleA: $('title-a'), titleB: $('title-b'),
   micA: $('mic-a'), micB: $('mic-b'),
-  autoSpeak: $('auto-speak'), continuous: $('continuous'),
+  autoSpeak: $('auto-speak'),
+  listen: $('listen'), listenLabel: $('listen-label'),
+  liveSrc: $('live-src'), liveDst: $('live-dst'),
   clear: $('clear'), status: $('status'),
   history: $('history'), historyEmpty: $('history-empty'),
   warning: $('support-warning'),
@@ -90,7 +92,10 @@ async function translateInto(src, text) {
   const seq = ++requestSeq;
   try {
     const result = await translate(text, langOf(src).code, langOf(dst).code);
-    if (seq === requestSeq) side[dst].text.value = result;
+    if (seq === requestSeq) {
+      side[dst].text.value = result;
+      els.liveDst.textContent = result;
+    }
     return result;
   } catch {
     if (seq === requestSeq) setStatus('Traduction impossible : vérifiez votre connexion Internet.');
@@ -172,15 +177,36 @@ function updateMics() {
     side[s].mic.setAttribute('aria-pressed', String(on));
     side[s].mic.querySelector('.mic-label').textContent = on ? 'Arrêter' : 'Parler';
   }
+  const ambient = activeSide === 'a';
+  els.listen.classList.toggle('listening', ambient);
+  els.listen.setAttribute('aria-pressed', String(ambient));
+  els.listenLabel.textContent = ambient ? "Arrêter l'écoute" : 'Écouter autour de moi';
 }
+
+// Garde l'écran allumé pendant l'écoute (sinon le téléphone se verrouille et coupe le micro).
+let wakeLock = null;
+async function keepAwake(on) {
+  try {
+    if (on && !wakeLock && 'wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } else if (!on && wakeLock) {
+      await wakeLock.release();
+    }
+  } catch { /* non pris en charge */ }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && activeSide) keepAwake(true);
+});
 
 function startListening(s) {
   stopListening();
   activeSide = s;
-  recognition = new SpeechRecognition();
+  const rec = new SpeechRecognition();
+  recognition = rec;
   recognition.lang = langOf(s).speech;
   recognition.interimResults = true;
-  recognition.continuous = els.continuous.checked;
+  recognition.continuous = true;
   recognition.maxAlternatives = 1;
 
   recognition.onresult = (event) => {
@@ -192,6 +218,7 @@ function startListening(s) {
     }
     if (interim) {
       side[s].text.value = interim;
+      els.liveSrc.textContent = interim;
       liveTranslate(s, interim);
     }
   };
@@ -209,8 +236,14 @@ function startListening(s) {
 
   // Chrome coupe l'écoute après un silence : on relance tant que l'utilisateur n'a pas arrêté.
   recognition.onend = () => {
-    if (activeSide === s && !pausedForSpeech && els.continuous.checked) {
-      try { recognition.start(); return; } catch { /* relance impossible */ }
+    if (activeSide === s && !pausedForSpeech) {
+      // Petit délai pour éviter une boucle rapide en cas d'erreur réseau répétée.
+      setTimeout(() => {
+        if (activeSide === s && recognition === rec && !pausedForSpeech) {
+          try { rec.start(); } catch { /* déjà relancée */ }
+        }
+      }, 250);
+      return;
     }
     if (!pausedForSpeech && activeSide === s) activeSide = null;
     updateMics();
@@ -218,6 +251,7 @@ function startListening(s) {
 
   try {
     recognition.start();
+    keepAwake(true);
     setStatus(`Écoute en ${langOf(s).name}…`);
   } catch {
     activeSide = null;
@@ -227,6 +261,7 @@ function startListening(s) {
 
 function stopListening() {
   activeSide = null;
+  keepAwake(false);
   pausedForSpeech = false;
   if (recognition) {
     recognition.onend = null;
@@ -240,10 +275,11 @@ async function commitSentence(s, transcript) {
   const text = transcript.trim();
   if (!text) return;
   side[s].text.value = text;
+  els.liveSrc.textContent = text;
   const translated = await translateInto(s, text);
   if (translated == null) return;
   addHistory(s, text, translated);
-  setStatus('Traduit.');
+  if (!activeSide) setStatus('Traduit.');
 
   if (!els.autoSpeak.checked) return;
   // Met le micro en pause pendant la lecture pour qu'il n'entende pas la traduction.
@@ -306,18 +342,22 @@ for (const s of ['a', 'b']) {
   });
 }
 
-els.continuous.addEventListener('change', () => {
-  if (activeSide) startListening(activeSide);
+els.listen.addEventListener('click', () => {
+  if (activeSide === 'a') { stopListening(); setStatus('Écoute arrêtée.'); }
+  else startListening('a');
 });
 
 els.clear.addEventListener('click', () => {
   els.history.replaceChildren();
   els.historyEmpty.hidden = false;
+  els.liveSrc.textContent = '';
+  els.liveDst.textContent = '';
 });
 
 if (!SpeechRecognition) {
   els.warning.hidden = false;
   els.micA.disabled = true;
+  els.listen.disabled = true;
   els.micB.disabled = true;
 }
 
